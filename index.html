@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="slick_test.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.css">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.css">
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.js"></script>
+  <title>さくらいテスト</title>
+<style>
+    @import url(https://fonts.googleapis.com/css?family=Work+Sans:300,600);
+    body{
+    font-size: 20px;
+    font-family: 'Work Sans', sans-serif;
+    color: #333;
+    font-weight: 300;
+    text-align: center;
+    background-color: #f8f6f0;
+    }
+    h1{
+    font-weight: 300;
+    margin: 0px;
+    padding: 10px;
+    font-size: 20px;
+    background-color: #444;
+    color: #fff;
+    }
+    .question{
+    font-size: 30px;
+    margin-bottom: 10px;
+    }
+    .answers {
+    margin-bottom: 20px;
+    text-align: left;
+    display: inline-block;
+    }
+    .answers label{
+    display: block;
+    margin-bottom: 10px;
+    }
+    button{
+    font-family: 'Work Sans', sans-serif;
+    font-size: 22px;
+    background-color: #279;
+    color: #fff;
+    border: 0px;
+    border-radius: 3px;
+    padding: 20px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    }
+    button:hover{
+    background-color: #38a;
+    }
+    .slide{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.5s;
+    }
+    .active-slide{
+    opacity: 1;
+    z-index: 2;
+    }
+    .quiz-container{
+    position: relative;
+    height: 200px;
+    margin-top: 40px;
+    }
+    Run Pen
+    Resources
+</style>
+</head>
+<br>
+    <h1>さくらいテスト</h1>
+    <div class="quiz-container">
+    <div id="quiz"></div>
+    </div>
+    <p></p>
+    <button id="previous">前の問題</button>
+    <button id="next">次の問題</button>
+    <button id="submit">結果確認</button>
+    <div id="results"></div>
+    <p></p>
+    <div class="autoplay">
+    <div><img src="img/fuka01.png"></div>
+    <div><img src="img/haru01.png"></div>
+    <div><img src="img/fuka02.png"></div>
+    <div><img src="img/haru02.png"></div>
+    <div><img src="img/fuka03.png"></div>
+    <!-- 640*360 -->
+    </div>
+
+<script type="text/javascript">
+(function(){
+    //問題文
+const myQuestions = [
+    {
+    question: "画像の猫、はるちゃんとふーちゃんに共通する特徴は何？",
+    answers: {
+        a:"夜中3時に外に出せと飼い主を起こす",
+        b:"抱っこが好き",
+        c:"モフモフしている",
+        d:"寝ている飼い主の上に乗ってくる"
+    },
+    answer_type: "radio",
+    correctAnswer:"c"
+    },
+    {
+    question: "はるちゃんの誕生日は？",
+    answers: {
+        a: "1月3日",
+        b: "3月3日",
+        c: "11月23日"
+    },
+    answer_type: "radio",
+    correctAnswer: "b"
+    },
+    {
+    question: "ふーちゃんの誕生日は？",
+    answers: {
+        a: "不明",
+        b: "7月2日",
+        c: "8月32日"
+    },
+    answer_type: "radio",
+    correctAnswer: "a"
+    },
+    {
+    question: "俗称で猫のエサのことをカタカナ4文字で何という？",
+    answers:{
+        a: "モフモフ",
+        b: "カリカリ",
+        c: "サバサバ"
+    },
+    answer_type:"radio",
+    correctAnswer: "b"
+    },
+    {
+    question: "はるちゃんとふーちゃんについて述べた文で間違っているものを選びなさい",
+    answers: {
+        a: "白茶がはるちゃん、茶トラがふーちゃん",
+        b: "茶トラがはるちゃん、白茶がふーちゃん",
+        c: "学術的に猫は液体と証明されているのではるちゃんとふーちゃんも液体である",
+        d: "2匹とも元々は保護猫である"
+    },
+    answer_type: "radio",
+    correctAnswer: "a"
+    }
+];
+
+
+//問題文の表示
+function buildQuiz(){
+    //HTML出力を格納する変数
+    const output = [];
+    let n=0;
+    //myQuestionsをforeach文で回す
+    myQuestions.forEach(
+    (currentQuestion, questionNumber) => {
+        //回答候補を変数に格納
+        const answers = [];
+        // and for each available answer...
+        
+        for(letter in currentQuestion.answers){
+            // ...add an HTML radio button
+            if (currentQuestion.answer_type == "textbox"){
+                answers.push(
+                    `
+                    <label for="ques">
+                    <input type="textbox" name="question${questionNumber}"id="ques"placeholder="カタカナ4文字">
+                    </label>
+                    <tr>
+                    <th></th>
+                    <td><div class="err-msg-name"></div></td>
+                    </tr>
+                    <tr>
+                    `
+                    );
+            }else if(currentQuestion.answer_type == "radio"){
+                answers.push(
+                        `
+                        <label>
+                        <input type="radio" name="question${questionNumber}"value="${letter}">
+                        ${letter} :
+                        ${currentQuestion.answers[letter]}
+                        </label>`
+                        );
+            }else{
+                answers.push(
+                        `
+                        <label>
+                        <input type="checkbox" name="question${questionNumber}"value="${letter}">
+                        ${letter} :
+                        ${currentQuestion.answers[letter]}
+                        </label>`
+                        );
+            }
+        }
+        // add this question and its answers to the output
+        output.push(
+        `<div class="slide">
+            <div class="question"> ${currentQuestion.question} </div>
+            <div class="answers"> ${answers.join("")} </div>
+        </div>`
+        );
+    }
+    );
+
+    // finally combine our output list into one string of HTML and put it on the page
+    quizContainer.innerHTML = output.join('');
+}
+
+function showResults(){
+
+    // gather answer containers from our quiz
+    const answerContainers = quizContainer.querySelectorAll('.answers');
+
+    // keep track of user's answers
+    let numCorrect = 0;
+
+    // for each question...
+    myQuestions.forEach( (currentQuestion, questionNumber) => {
+
+    // find selected answer
+    const answerContainer = answerContainers[questionNumber];
+    const selector = `input[name=question${questionNumber}]:checked`;
+    const userAnswer = (answerContainer.querySelector(selector)||{}).value;
+
+    // if answer is correct
+    if(userAnswer === currentQuestion.correctAnswer){
+        // add to the number of correct answers
+        numCorrect++;
+
+        // color the answers green
+        answerContainers[questionNumber].style.color = 'lightgreen';
+    }
+    // if answer is wrong or blank
+    else{
+        // color the answers red
+        answerContainers[questionNumber].style.color = 'red';
+    }
+    });
+
+    // show number of correct answers out of total
+    resultsContainer.innerHTML = `${myQuestions.length}問中、正解は${numCorrect}問でした！`;
+}
+
+function showSlide(n) {
+    slides[currentSlide].classList.remove('active-slide');
+    slides[n].classList.add('active-slide');
+    currentSlide = n;
+    if(currentSlide === 0){
+    previousButton.style.display = 'none';
+    }
+    else{
+    previousButton.style.display = 'inline-block';
+    }
+    if(currentSlide === slides.length-1){
+    nextButton.style.display = 'none';
+    submitButton.style.display = 'inline-block';
+    }
+    else{
+    nextButton.style.display = 'inline-block';
+    submitButton.style.display = 'none';
+    }
+}
+
+function showNextSlide() {
+    showSlide(currentSlide + 1);
+}
+
+function showPreviousSlide() {
+    showSlide(currentSlide - 1);
+}
+
+// Variables
+const quizContainer = document.getElementById('quiz');
+const resultsContainer = document.getElementById('results');
+const submitButton = document.getElementById('submit');
+
+
+
+// Kick things off
+buildQuiz();
+
+// Pagination
+const previousButton = document.getElementById("previous");
+const nextButton = document.getElementById("next");
+const slides = document.querySelectorAll(".slide");
+let currentSlide = 0;
+
+// Show the first slide
+showSlide(currentSlide);
+
+// Event listeners
+submitButton.addEventListener('click', showResults);
+previousButton.addEventListener("click", showPreviousSlide);
+nextButton.addEventListener("click", showNextSlide);
+})();
+
+//画像スライド
+$('.autoplay').slick({
+   slidesToShow: 3,
+   slidesToScroll:1,
+   autoplay: true,
+   autoplaySpeed: 3000,
+ // 画像下のドット（ページ送り）を表示
+   dots:true,
+});
+$('.autoplay').slick({
+  dots:true, //下の丸ぽっち（インジケーター）を表示 
+  autoplay:true, //自動再生 
+  autoplaySpeed: 5000 //自動再生の速度 
+  //ここにオプションを書いていく 
+});
+
+
+Resources
+</script>
+</body>
+</html>
